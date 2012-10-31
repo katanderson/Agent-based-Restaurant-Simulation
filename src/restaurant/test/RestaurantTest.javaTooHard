@@ -1,0 +1,65 @@
+package restaurant.test;
+
+import junit.framework.TestCase;
+import java.util.List;
+
+import restaurant.layoutGUI.*;
+import astar.*;
+import java.util.concurrent.*;
+import restaurant.*;
+
+
+public class RestaurantTest extends TestCase
+{
+
+    static int gridX = 20;
+    static int gridY = 15;
+    static int nTables =2;
+    public RestaurantTest(String s)
+    {
+        super(s);
+    }
+
+    /**
+     * Here we test to ensure that a customer is seated in a reasonable timeframe (5 seconds).
+     */
+    public void testSeatingTime()
+    {
+	Restaurant restaurant =
+		new Restaurant("Welcome to My Restaurant", gridX, gridY, true);
+	
+	Semaphore[][] grid = new Semaphore[gridX+1][gridY+1]; 
+	AStarTraversal aStarTraversal = new AStarTraversal(grid);
+	restaurant.WaiterAgent waiter = new WaiterAgent("Bob",null,aStarTraversal,
+	    restaurant,nTables);
+	restaurant.CookAgent cook = new CookAgent("George",restaurant);
+	restaurant.HostAgent host = new HostAgent("Lucy",nTables);    
+	restaurant.CustomerAgent c1 = new CustomerAgent("Sally",null,restaurant);
+
+        c1.setHost(host);
+	host.setWaiter(waiter);
+	waiter.setHost(host);
+	waiter.setCook(cook);
+
+        host.msgIWantToEat(c1);
+
+        try
+        {
+            //wait 5 seconds
+            Thread.sleep(5000);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * A small example on how to set up other tests within this TestCase.
+     */
+    public void testTheObvious()
+    {
+        assertTrue(true);
+    }
+}

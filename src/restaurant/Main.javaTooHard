@@ -1,0 +1,64 @@
+package restaurant;
+import astar.*;
+
+public class Main {
+
+    public static void main(String argv[]) {
+	/*
+	The following lines create our four agents.
+	Each agent instance has a thread in which it runs.
+	The thread is created and started by the constructor.
+*/
+	Object[][] grid = new Object[5][5]; 
+	AStarTraversal aStarTraversal = new AStarTraversal(grid);
+	HostAgent host = new HostAgent("Mr. Bob");
+	host.startThread();
+	CookAgent headCook = new CookAgent("Master Chef");
+	headCook.startThread();
+	WaiterAgent waiter1 = new WaiterAgent("Waiter Billy",null,aStarTraversal);
+	WaiterAgent waiter2 = new WaiterAgent("Waiter Mike",null,aStarTraversal);
+	CustomerAgent c1 = new CustomerAgent("Fred",null);
+	CustomerAgent c2 = new CustomerAgent("Ethel",null);
+	CustomerAgent c3 = new CustomerAgent("Ginger",null);
+	host.setWaiter(waiter2);
+	host.setWaiter(waiter1);
+	waiter2.setCook(headCook);
+	waiter2.setHost(host);
+	waiter2.startThread();
+	waiter1.setCook(headCook);
+	waiter1.setHost(host);
+	waiter1.startThread();
+
+	c1.startThread();
+	c2.startThread();
+	c3.startThread();
+	/*
+	The next three lines tell the customer instances who
+	the host is. If we were doing this using
+	RemoteMethodInvocation (RMI), the agents would find
+	each other through the Java rimregistry. The maitrD will
+	learn of the customers through the first message the customer
+	sends to the maitrD.
+*/
+	c1.setHost(host);
+	c2.setHost(host);
+	c3.setHost(host);
+	/*
+	At this point the agents are started, but are not doing anything,
+	because nothing has happened to make them do things. So, we (artifically)
+	make each customer hungry. c2 is made especially hungry (that will make
+	him eat longer.)
+*/
+	c1.setHungry();
+	c2.setHungerLevel(13);
+	c2.setHungry();
+	c3.setHungry();
+	/*
+	This main thread ends leaving the agents to "fend for themselves." You
+	will see that after a customer is fed and not hungry, it will set a timer
+	to set it hungry again later. That's why this runs for ever.
+*/
+    }
+
+}
+
